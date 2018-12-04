@@ -19,6 +19,9 @@ lowerbound dict t
           | k >= t     = (False, (t, v))
           | otherwise = (True, (t, old))
 
+-- Element in range [first ,last) that is greater then value, or LAST if nothing found
+
+
 -- Sorts a tuple list
 sortTupleListByFirst :: (Ord a) => [(a, b)] -> [(a, b)]
 sortTupleListByFirst xs = sortBy (\x y -> compare (fst x) (fst y)) xs

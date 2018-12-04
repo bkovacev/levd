@@ -1,6 +1,5 @@
-module Lib
-    ( someFunc
-    ) where
+module Lib where
 
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+runDriver :: IO ()
+runDriver =
+  putStrLn "hello world"
