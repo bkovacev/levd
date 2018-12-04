@@ -26,6 +26,8 @@ library:
   source-dirs: src
   dependencies:
     - containers
+    - yaml
+    - bytestring
 
 executables:
   levd-exe:
@@ -38,6 +40,8 @@ executables:
     dependencies:
     - levd
     - containers
+    - yaml
+    - bytestring
 
 tests:
   levd-test:

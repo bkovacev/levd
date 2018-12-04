@@ -1,0 +1,26 @@
+fan_profile:
+  -
+    - 30
+    - 30
+  -
+    - 35
+    - 40
+  -
+    - 40
+    - 60
+  -
+    - 42
+    - 70
+  -
+    - 43
+    - 80
+  -
+    - 45
+    - 100
+main_color:  4
+alt_color: 15
+enable_color: true
+enable_blink: false
+blink_ival: 7
+alter_ival: 9
+
