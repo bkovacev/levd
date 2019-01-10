@@ -19,12 +19,13 @@ class KrakenDriver {
   void setFanSpeed(unsigned char);
   void setPumpSpeed(unsigned char);
   void setColor(uint32_t);
-  std::map<std::string, uint32_t> sendKrakenUpdate();
+  std::map<std::string, uint32_t> sendColorUpdate();
+  std::map<std::string, uint32_t> sendSpeedUpdate();
 
   std::string getSerialNumber() const;
 
  private:
-  void sendControlTransfer(uint16_t wValue);
+  bool sendControlTransfer(uint16_t wValue);
   bool sendBulkRawData(unsigned char *data, const size_t length);
   bool readBulkRawData(unsigned char *results, const size_t length);
 

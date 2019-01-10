@@ -26,8 +26,11 @@ KrakenDriver::KrakenDriver(libusb_device *kraken_device)
   // Grab endpoints via libusb
   CHECK (_config->bConfigurationValue == kMainConfigurationValue)
     << "bConfigurationValue must equal: " << kMainConfigurationValue;
-  CHECK(libusb_set_configuration(_handle, kMainConfigurationValue) == 0)
-    << "Error when setting kraken usb configuration";
+  const int set_configuration_result =
+    libusb_set_configuration(_handle, kMainConfigurationValue);
+  CHECK(set_configuration_result == 0)
+    << "Error when setting kraken usb configuration, got: "
+    << libusb_error_name(set_configuration_result);
   const libusb_interface_descriptor main_interface =
     get_main_usb_interface(_config);
   const libusb_endpoint_descriptor *endpoints = main_interface.endpoint;
@@ -57,7 +60,7 @@ std::string KrakenDriver::getSerialNumber() const {
 
 void KrakenDriver::setFanSpeed(unsigned char fan_speed) {
   CHECK(fan_speed <= 100 && fan_speed >= 30 && fan_speed % 5 == 0)
-    << "Fan speed must be between 30 and 100 and divisible by 5: " 
+    << "Fan speed must be between 30 and 100 and divisible by 5: "
     << (uint32_t)fan_speed;
   _fan_speed[1] = fan_speed;
 }
@@ -77,38 +80,23 @@ void KrakenDriver::setColor(uint32_t c) {
   _color[3] = color[2];
 }
 
-std::map<std::string, uint32_t> KrakenDriver::sendKrakenUpdate() {
+std::map<std::string, uint32_t> KrakenDriver::sendColorUpdate() {
+  sendControlTransfer(KRAKEN_BEGIN);
+  sendBulkRawData(_color, 19);
+  return receiveStatus();
+}
+
+std::map<std::string, uint32_t> KrakenDriver::sendSpeedUpdate() {
   sendControlTransfer(KRAKEN_BEGIN);
   sendBulkRawData(_pump_speed, 2);
-  sendBulkRawData(_color, 19);
-  receiveStatus();  // ignore?
-  sendControlTransfer(KRAKEN_BEGIN);
   sendBulkRawData(_fan_speed, 2);
   return receiveStatus();
 }
 
 /** ********** Private interface ********** */
 
-void KrakenDriver::sendControlTransfer(uint16_t wValue) {
-  static const unsigned int kKrakenUsbTimeout = 1000;
-  int r = libusb_control_transfer(_handle, 0x40, 2, wValue, 0, NULL, 0,
-                                  kKrakenUsbTimeout);
-  CHECK(r == 0) << "Error when performing initialization of device: "
-                << libusb_error_name(r) << " -- "
-                << libusb_strerror((libusb_error)r);
-}
-
-
-std::map<std::string, uint32_t> KrakenDriver::receiveStatus() {
-  unsigned char status[32];
-  std::map<std::string, uint32_t> results;
-  if (readBulkRawData(status, 32) == false) {
-    return results;
-  }
-  results["fan_speed"]          = 256 * status[0] + status[1];
-  results["pump_speed"]         = 256 * status[8] + status[9];
-  results["liquid_temperature"] = status[10];
-  return results;
+bool KrakenDriver::sendControlTransfer(uint16_t wValue) {
+  return transfer_control_value(_handle, wValue);
 }
 
 bool KrakenDriver::sendBulkRawData(unsigned char *data, const size_t length) {
@@ -120,4 +108,16 @@ bool KrakenDriver::readBulkRawData(unsigned char *results,
                                    const size_t   length) {
   return transfer_bulk_raw_data(_handle, _endpointIn.bEndpointAddress, results,
                                 length);
+}
+
+std::map<std::string, uint32_t> KrakenDriver::receiveStatus() {
+  unsigned char status[32];
+  std::map<std::string, uint32_t> results;
+  if (readBulkRawData(status, 32) == false) {
+    return results;
+  }
+  results["fan_speed"]          = 256 * status[0] + status[1];
+  results["pump_speed"]         = 256 * status[8] + status[9];
+  results["liquid_temperature"] = status[10];
+  return results;
 }
