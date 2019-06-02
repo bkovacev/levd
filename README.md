@@ -66,7 +66,7 @@ $ sudo systemctl start levd # stop sends SIGKILL to process, gracefully terminat
 
 The program must see a valid `levd.cfg` file located in `/etc/leviathan`. A sample can be found in the `config/` folder. Your configuration file must be in yaml format and contain at least the `main_color`, `temperature_source`, `fan_profile` and `interval` properties.
 
-To set a fan curve, add to the `fan_profile` list, other lists of size two. These are data points which build your fan profile curve - x value being temp (cpu or liquid, in C) and y value being fan percentage (in factors of 5, 30 being lowest, 100 highest).
+To set a fan curve, add to the `fan_profile` list, other lists of size two. These are data points which build your fan profile curve - x value being temp (cpu or liquid, in C) and y value being fan percentage (in factors of 5, 30 being lowest, 100 highest). Use the configuration property key `temperature_source` to change between the two supported values `liquid` and `CPU`. If no paramter is detected, `CPU` is chosen as the default.
 
 You can also set a different profile for the pump using `pump_profile`. If unspecified, the pump will follow `fan_profile`. For example:
 ```
