@@ -12,6 +12,11 @@ This project depends on glog, yaml-cpp, libusb and lm_sensors. On fedora:
 $ sudo dnf install yaml-cpp-devel glog-devel libusb-devel lm_sensors-devel
 ```
 
+This project also depends on an up-to-date cpp compiler:
+
+```
+$ sudo dnf install gcc-c++
+```
 
 
 ### Building
@@ -47,7 +52,7 @@ Install the project...
 
 ### Setting up for use as daemon
 
-Now that all of the necessary files have been copied into their respecive locations (also with the correct permissions), you'll have to let systemctl be aware of the modifications we're introducing. Follow the examples below:
+Now that all of the necessary files have been copied into their respective locations (also with the correct permissions), you'll have to let systemctl be aware of the modifications we're introducing. Follow the examples below:
 
 ```
 $ sudo systemctl daemon-reload # Use this whenever levd.service changes
